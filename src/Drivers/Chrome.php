@@ -13,25 +13,30 @@ class Chrome implements DriverInterface
     /** @var int */
     private $port;
 
+    /** @var string|null */
+    private $driverPath;
+
     /** @var Process<int, string>|null */
     private $process;
 
     /** @var WebDriverCapabilities */
     private $capabilities;
 
-
     /**
      * Create a new instance and automatically start the driver.
+     * @param string $driverPath Path to chromedriver binary
+     * @param array<string> $arguments Options to pass to chrome when starting
      */
-    public function __construct(int $port = 9515)
+    public function __construct(int $port = 9515, ?string $driverPath = null, array $arguments = [])
     {
         $this->port = $port;
+        $this->driverPath = $driverPath;
 
         $this->start();
 
         $capabilities = DesiredCapabilities::chrome();
 
-        $options = (new ChromeOptions())->addArguments(["--headless"]);
+        $options = (new ChromeOptions())->addArguments(array_merge(["--headless"], $arguments));
         $capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 
         $this->setCapabilities($capabilities);
@@ -64,7 +69,7 @@ class Chrome implements DriverInterface
     public function start(): DriverInterface
     {
         if (!$this->process) {
-            $this->process = (new ChromeProcess($this->port))->toProcess();
+            $this->process = (new ChromeProcess($this->port, $this->driverPath))->toProcess();
             $this->process->start();
             sleep(1);
         }

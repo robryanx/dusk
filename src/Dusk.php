@@ -31,11 +31,13 @@ class Dusk
      * Create a new instance.
      *
      * @param DriverInterface $driver The browser driver to use
+     * @param string $driverPath Path to chromedriver binary
+     * @param array<string> $arguments Options to pass to chrome when starting
      */
-    public function __construct(DriverInterface $driver = null)
+    public function __construct(DriverInterface $driver = null, ?string $driverPath = null, array $arguments = [])
     {
         if ($driver === null) {
-            $driver =  new Chrome();
+            $driver = new Chrome(9515, $driverPath, $arguments);
         }
 
         $this->browser = new Browser($driver->getDriver());
